@@ -9,5 +9,16 @@ namespace SimpleBot
     {
         public string Id { get; set; }
         public int Visitas { get; set; }
+
+        public void GetProfile()
+        {
+
+        }
+
+        public void SetProfile()
+        {
+
+        }
+
     }
 }
