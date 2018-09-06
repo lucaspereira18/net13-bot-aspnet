@@ -13,7 +13,7 @@ namespace SimpleBot
         public static string Reply(Message message)
         {
 
-            var client = new MongoClient("mongodb://localhost:27017");
+            /*var client = new MongoClient("mongodb://localhost:27017");
             var db = client.GetDatabase("db01");
             var col = db.GetCollection<BsonDocument>("tabela1");
 
@@ -24,17 +24,55 @@ namespace SimpleBot
 
             };
 
-            col.InsertOne(doc);
+            col.InsertOne(doc);*/
+
+            var profile = GetProfile(message.Id);
+
+            profile.Visitas += 1;
+
+            SetProfile(message.Id, profile);
+
             return $"{message.User} disse '{message.Text}'";
         }
 
         public static UserProfile GetProfile(string id)
         {
-            return null;
+            var client = new MongoClient();
+            var db = client.GetDatabase("db01");
+            var col = db.GetCollection<BsonDocument>("tabela1");
+            var filtro = Builders<BsonDocument>.Filter.Eq("id", id);
+            var retorno = col.Find(filtro).ToList().First<BsonDocument>() ;
+
+            /*var docFiltro = new BsonDocument()
+            {
+                {"id", id }
+            };
+
+            var retorno = col.Find(docFiltro);*/
+
+            var profile = new UserProfile();
+            profile.Id = retorno.GetElement("id").Value.ToString();
+            profile.Visitas = retorno.GetElement("visitas").Value.ToInt32();
+
+            return profile;
         }
 
         public static void SetProfile(string id, UserProfile profile)
         {
+
+            var client = new MongoClient();
+            var db = client.GetDatabase("db01");
+            var col = db.GetCollection<BsonDocument>("tabela1");
+            var filtro = Builders<BsonDocument>.Filter.Eq("id", id);
+
+            var doc = new BsonDocument()
+            {
+                {"id", id },
+                {"visitas", profile.Visitas }
+
+            };
+
+            col.ReplaceOne(filtro, doc);
 
         }
     }
