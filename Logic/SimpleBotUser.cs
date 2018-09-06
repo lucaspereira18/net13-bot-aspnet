@@ -28,7 +28,11 @@ namespace SimpleBot
 
             var profile = GetProfile(message.Id);
 
-            profile.Visitas += 1;
+            if (profile != null)
+            {
+                profile.Visitas += 1;
+
+            }
 
             SetProfile(message.Id, profile);
 
@@ -49,12 +53,22 @@ namespace SimpleBot
             };
 
             var retorno = col.Find(docFiltro);*/
+            if (retorno != null)
+            {
+                var profile = new UserProfile();
+                profile.Id = retorno.GetElement("id").Value.ToString();
+                
+                profile.Visitas = retorno.GetElement("visitas").Value.ToInt32();
 
-            var profile = new UserProfile();
-            profile.Id = retorno.GetElement("id").Value.ToString();
-            profile.Visitas = retorno.GetElement("visitas").Value.ToInt32();
+                return profile;
+            }
+            else
+            {
+                return null;
+            }
+           
 
-            return profile;
+           
         }
 
         public static void SetProfile(string id, UserProfile profile)
@@ -72,6 +86,7 @@ namespace SimpleBot
 
             };
 
+            //col.ReplaceOne(filtro, doc,  { upsert: true });
             col.ReplaceOne(filtro, doc);
 
         }
